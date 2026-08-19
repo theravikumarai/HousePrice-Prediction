@@ -28,6 +28,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Run tests
+        run: |
+          pytest tests/ -v
+          
       - name: Validate FastAPI application
         run: |
           python -c "from app.main import app; print('FastAPI application loaded successfully')"
