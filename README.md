@@ -1,156 +1,250 @@
+Absolutely. Replace your current `README.md` with the following updated version.
+
 # House Price Prediction
 
-A machine learning API for predicting house prices using **FastAPI**, **CatBoost**, and **Docker**.
+A containerized machine learning application for predicting house prices using a **CatBoostRegressor**, served through **FastAPI** and consumed through a **Streamlit** user interface.
 
-## Overview
-
-The API serves a trained `CatBoostRegressor` model through REST endpoints.
+## Architecture
 
 ```text
-Client
-  ↓
-FastAPI
-  ↓
-Input Validation
-  ↓
-Feature Engineering
-  ↓
-CatBoost Model
-  ↓
-Price Prediction
+                    ┌─────────────────┐
+                    │     Browser     │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │    Streamlit    │
+                    │    Frontend     │
+                    │ localhost:8501  │
+                    └────────┬────────┘
+                             │
+                       POST /predict
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │     FastAPI     │
+                    │     Backend     │
+                    │ localhost:8000  │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │  Preprocessing  │
+                    │ Feature Creation│
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ CatBoostRegressor│
+                    │    model.pkl    │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    Predicted House Price
 ```
+
+## Features
+
+* House price prediction using CatBoost
+* REST API built with FastAPI
+* Interactive Streamlit frontend
+* Automatic feature engineering
+* Health check endpoint
+* Swagger API documentation
+* Dockerized backend and frontend
+* Multi-container orchestration with Docker Compose
 
 ## Tech Stack
 
-* Python
-* FastAPI
-* CatBoost
-* Pandas
-* NumPy
-* Docker
+| Category         | Technology        |
+| ---------------- | ----------------- |
+| Language         | Python            |
+| ML Model         | CatBoostRegressor |
+| Backend          | FastAPI           |
+| Frontend         | Streamlit         |
+| Data Processing  | Pandas, NumPy     |
+| API Server       | Uvicorn           |
+| Containerization | Docker            |
+| Orchestration    | Docker Compose    |
 
 ## Project Structure
 
 ```text
-house-price-prediction-api/
+HousePrice-Prediction/
 │
 ├── app/
 │   ├── main.py
 │   ├── model.py
 │   └── preprocessing.py
 │
+├── frontend/
+│   ├── streamlit_app.py
+│   └── Dockerfile
+│
 ├── models/
 │   └── model.pkl
 │
-├── requirements.txt
 ├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
-## Features
+## Application Flow
 
-* REST API using FastAPI
-* House price prediction with CatBoost
-* Automatic feature engineering
-* Model loaded at application startup
-* Health check endpoint
-* Interactive API documentation
-* Dockerized application
+```text
+User Input
+    ↓
+Streamlit UI
+    ↓
+POST /predict
+    ↓
+FastAPI
+    ↓
+Request Validation
+    ↓
+Feature Engineering
+    ├── HouseAge
+    ├── RemodAge
+    ├── TotalSF
+    └── TotalBath
+    ↓
+Feature Alignment
+    ↓
+CatBoostRegressor
+    ↓
+Log-Scale Prediction
+    ↓
+np.expm1()
+    ↓
+Predicted House Price
+```
 
 ## API Endpoints
 
-| Method | Endpoint   | Description         |
-| ------ | ---------- | ------------------- |
-| GET    | `/`        | API information     |
-| GET    | `/health`  | Health check        |
-| POST   | `/predict` | Predict house price |
-| GET    | `/docs`    | Swagger UI          |
+| Method | Endpoint   | Description                       |
+| ------ | ---------- | --------------------------------- |
+| GET    | `/`        | API information                   |
+| GET    | `/health`  | Application health check          |
+| POST   | `/predict` | Predict house price               |
+| GET    | `/docs`    | Interactive Swagger documentation |
 
 ## Run Locally
 
-Clone the repository:
+### 1. Clone the repository
 
 ```bash
-git clone <your-repository-url>
-cd house-price-prediction-api
+git clone <repository-url>
+cd HousePrice-Prediction
 ```
 
-Create and activate a virtual environment:
+### 2. Create a virtual environment
 
 ```bash
-python -m venv .venv
+python -m venv venv
 ```
 
-Windows:
+Activate it on Windows:
 
 ```bash
-.venv\Scripts\activate
+venv\Scripts\activate
 ```
 
-Install dependencies:
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the application:
+### 4. Start the FastAPI backend
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Open:
+Backend:
+
+```text
+http://127.0.0.1:8000
+```
+
+Swagger documentation:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-## Docker
+### 5. Start the Streamlit frontend
 
-Build the image:
-
-```bash
-docker build -t house-price-api .
-```
-
-Run the container:
+Open another terminal and run:
 
 ```bash
-docker run -p 8000:8000 house-price-api
+streamlit run frontend/streamlit_app.py
 ```
 
-Open:
+Frontend:
 
 ```text
-http://127.0.0.1:8000/docs
+http://localhost:8501
 ```
 
-## Prediction Flow
+## Run with Docker Compose
+
+The easiest way to run the complete application is with Docker Compose.
+
+```bash
+docker compose up --build
+```
+
+This command will:
+
+1. Build the FastAPI Docker image
+2. Build the Streamlit Docker image
+3. Create a shared Docker network
+4. Start the backend container
+5. Start the frontend container
+
+Access the application:
+
+| Service            | URL                          |
+| ------------------ | ---------------------------- |
+| Streamlit Frontend | `http://localhost:8501`      |
+| FastAPI API        | `http://localhost:8000`      |
+| Swagger UI         | `http://localhost:8000/docs` |
+
+To stop the application:
+
+```bash
+docker compose down
+```
+
+## Docker Architecture
 
 ```text
-POST /predict
-      ↓
-Request Validation
-      ↓
-Feature Engineering
-      ├── HouseAge
-      ├── RemodAge
-      ├── TotalSF
-      └── TotalBath
-      ↓
-Feature Alignment
-      ↓
-CatBoostRegressor
-      ↓
-Log Prediction
-      ↓
-np.expm1()
-      ↓
-Predicted House Price
+Docker Compose
+│
+├── frontend
+│   ├── Streamlit
+│   ├── Port 8501
+│   └── Sends requests to backend
+│
+└── backend
+    ├── FastAPI
+    ├── Port 8000
+    ├── Preprocessing
+    └── CatBoost Model
 ```
 
-## Example Response
+Inside Docker Compose, the frontend communicates with the backend using the service name:
+
+```text
+http://backend:8000/predict
+```
+
+This is configured using an environment variable.
+
+## Example Prediction Response
 
 ```json
 {
@@ -158,33 +252,83 @@ Predicted House Price
 }
 ```
 
-## Run with Docker
+## Key Concepts Demonstrated
 
-```text
-docker build
-     ↓
-Docker Image
-     ↓
-docker run
-     ↓
-FastAPI Container
-     ↓
-POST /predict
-```
+This project demonstrates:
+
+* Machine learning model serving
+* FastAPI REST API development
+* Pydantic request validation
+* Feature engineering during inference
+* Model serialization and loading
+* Streamlit frontend development
+* Frontend-to-backend API communication
+* Docker image creation
+* Docker container execution
+* Multi-container applications with Docker Compose
+* Service-to-service communication using Docker networking
 
 ## Future Improvements
 
-* Add automated tests
-* Add strict request schemas
-* Add structured logging
-* Add GitHub Actions CI/CD
+* Add unit and integration tests
+* Add automated testing with `pytest`
+* Implement GitHub Actions CI/CD
 * Push Docker images to Docker Hub or AWS ECR
-* Deploy to AWS
-* Add monitoring and model versioning
+* Add structured logging
+* Add model versioning with MLflow
+* Add input validation with stricter schemas
+* Deploy the application to AWS
+* Add monitoring and observability
 
-## Key Takeaway
+## Run Summary
 
-This project demonstrates how to serve a trained machine learning model as a REST API and package the application using Docker.
+### Local development
+
+```text
+Terminal 1
+    ↓
+FastAPI
+    ↓
+localhost:8000
+
+
+Terminal 2
+    ↓
+Streamlit
+    ↓
+localhost:8501
+```
+
+### Containerized application
+
+```text
+docker compose up --build
+            ↓
+     Docker Network
+            │
+      ┌─────┴─────┐
+      ▼           ▼
+ Streamlit      FastAPI
+  :8501          :8000
+                    │
+                    ▼
+             CatBoost Model
+```
+
+## License
+
+This project is intended for learning and portfolio purposes.
 
 ---
 
+### Next Git commands
+
+Since you have added Streamlit, Docker Compose, and updated the README:
+
+```bash
+git add .
+git commit -m "Add Streamlit frontend and Docker Compose support"
+git push
+```
+
+This README now documents the complete **Streamlit + FastAPI + CatBoost + Docker Compose** architecture and is suitable for your project repository.

@@ -1,0 +1,17 @@
+services:
+
+  backend:
+    build: .
+    container_name: house-price-api
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: house-price-ui
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
