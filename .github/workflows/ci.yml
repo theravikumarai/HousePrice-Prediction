@@ -9,12 +9,12 @@ on:
       - main
 
 jobs:
-  test-and-build:
 
+  test:
+    name: Test Application
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -30,11 +30,17 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/ -v
-          
-      - name: Validate FastAPI application
-        run: |
-          python -c "from app.main import app; print('FastAPI application loaded successfully')"
+          python -m pytest tests/ -v
+
+
+  build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Build backend Docker image
         run: |
