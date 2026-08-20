@@ -320,15 +320,3 @@ docker compose up --build
 This project is intended for learning and portfolio purposes.
 
 ---
-
-### Next Git commands
-
-Since you have added Streamlit, Docker Compose, and updated the README:
-
-```bash
-git add .
-git commit -m "Add Streamlit frontend and Docker Compose support"
-git push
-```
-
-This README now documents the complete **Streamlit + FastAPI + CatBoost + Docker Compose** architecture and is suitable for your project repository.
