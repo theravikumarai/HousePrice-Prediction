@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: house-price-frontend-ingress
+
+spec:
+  ingressClassName: nginx
+
+  rules:
+    - host: house-price.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: house-price-frontend-service
+                port:
+                  number: 8501
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: house-price-backend-ingress
+  
+
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+spec:
+  ingressClassName: nginx
+
+  rules:
+    - host: house-price.local
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: house-price-backend-service
+                port:
+                  number: 8000

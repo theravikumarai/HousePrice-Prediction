@@ -7,10 +7,17 @@ from app.model import model
 from app.preprocessing import preprocess_input
 
 
+# app = FastAPI(
+#     title="House Price Prediction API",
+#     description="Predict house prices using CatBoostRegressor",
+#     version="1.0.0",
+# )
+
 app = FastAPI(
     title="House Price Prediction API",
     description="Predict house prices using CatBoostRegressor",
     version="1.0.0",
+    root_path="/api",
 )
 
 

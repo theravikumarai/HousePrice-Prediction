@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: house-price-frontend-config
+  namespace: house-price
+
+data:
+  API_URL: "http://house-price-backend-service:8000/predict"

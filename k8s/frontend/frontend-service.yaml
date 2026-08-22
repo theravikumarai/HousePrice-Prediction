@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: house-price-frontend-service
+  namespace: house-price
+
+spec:
+  selector:
+    app: house-price-frontend
+
+  ports:
+    - protocol: TCP
+      port: 8501
+      targetPort: 8501
+
+  type: ClusterIP

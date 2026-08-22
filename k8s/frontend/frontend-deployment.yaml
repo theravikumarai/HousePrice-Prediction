@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: house-price-frontend
+  namespace: house-price
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: house-price-frontend
+
+  template:
+    metadata:
+      labels:
+        app: house-price-frontend
+
+    spec:
+      containers:
+        - name: frontend
+          image: raviikrds/house-price-frontend:latest
+
+          ports:
+            - containerPort: 8501
+
+          # env:
+          #   - name: API_URL
+          #     value: "http://house-price-backend-service:8000/predict"
+          env:
+            - name: API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: house-price-frontend-config
+                  key: API_URL
+              
