@@ -1,322 +1,572 @@
-Absolutely. Replace your current `README.md` with the following updated version.
-
 # House Price Prediction
 
-A containerized machine learning application for predicting house prices using a **CatBoostRegressor**, served through **FastAPI** and consumed through a **Streamlit** user interface.
+An end-to-end machine learning application for predicting house prices. The project exposes a trained machine learning model through a FastAPI service, provides an interactive Streamlit interface, and demonstrates containerized deployment and orchestration using Docker and Kubernetes.
+
+## Overview
+
+The application follows a service-based architecture:
+
+- **Frontend:** Streamlit
+- **Backend:** FastAPI
+- **Machine Learning Model:** CatBoost
+- **Containerization:** Docker
+- **Local Orchestration:** Docker Compose
+- **Container Orchestration:** Kubernetes
+- **Autoscaling:** Horizontal Pod Autoscaler (HPA)
+- **Traffic Routing:** NGINX Ingress
+- **Configuration Management:** ConfigMap and Kubernetes Secrets
+- **Testing:** Pytest
+
+The project demonstrates the complete workflow from machine learning model serving to containerized and Kubernetes-based deployment.
+
+---
 
 ## Architecture
 
 ```text
-                    ┌─────────────────┐
-                    │     Browser     │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │    Streamlit    │
-                    │    Frontend     │
-                    │ localhost:8501  │
-                    └────────┬────────┘
-                             │
-                       POST /predict
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │     FastAPI     │
-                    │     Backend     │
-                    │ localhost:8000  │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │  Preprocessing  │
-                    │ Feature Creation│
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ CatBoostRegressor│
-                    │    model.pkl    │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    Predicted House Price
+                                User
+                                  │
+                                  ▼
+                         house-price.local
+                                  │
+                                  ▼
+                       NGINX Ingress Controller
+                                  │
+                    ┌─────────────┴─────────────┐
+                    │                           │
+                    ▼                           ▼
+                   /                          /api
+                    │                           │
+                    ▼                           ▼
+          Frontend Kubernetes Service   Backend Kubernetes Service
+                    │                           │
+                    ▼                           ▼
+             Streamlit Pods                 FastAPI Pods
+                                                │
+                                                ▼
+                                          CatBoost Model
+````
+
+### Request Flow
+
+```text
+User
+  │
+  ▼
+Streamlit Frontend
+  │
+  ▼
+FastAPI Backend
+  │
+  ▼
+Machine Learning Model
+  │
+  ▼
+Predicted House Price
 ```
 
-## Features
+---
 
-* House price prediction using CatBoost
-* REST API built with FastAPI
-* Interactive Streamlit frontend
-* Automatic feature engineering
-* Health check endpoint
-* Swagger API documentation
-* Dockerized backend and frontend
-* Multi-container orchestration with Docker Compose
+## Technology Stack
 
-## Tech Stack
+| Category          | Technology                |
+| ----------------- | ------------------------- |
+| Language          | Python                    |
+| Machine Learning  | CatBoost                  |
+| Backend           | FastAPI                   |
+| Frontend          | Streamlit                 |
+| API Server        | Uvicorn                   |
+| Containerization  | Docker                    |
+| Local Development | Docker Compose            |
+| Orchestration     | Kubernetes                |
+| Autoscaling       | Horizontal Pod Autoscaler |
+| Traffic Routing   | NGINX Ingress             |
+| Configuration     | ConfigMap                 |
+| Secret Management | Kubernetes Secrets        |
+| Resource Metrics  | Metrics Server            |
+| Testing           | Pytest                    |
 
-| Category         | Technology        |
-| ---------------- | ----------------- |
-| Language         | Python            |
-| ML Model         | CatBoostRegressor |
-| Backend          | FastAPI           |
-| Frontend         | Streamlit         |
-| Data Processing  | Pandas, NumPy     |
-| API Server       | Uvicorn           |
-| Containerization | Docker            |
-| Orchestration    | Docker Compose    |
+---
 
-## Project Structure
+## Repository Structure
 
 ```text
 HousePrice-Prediction/
 │
-├── app/
-│   ├── main.py
-│   ├── model.py
-│   └── preprocessing.py
+├── .github/                     # CI/CD workflows
 │
-├── frontend/
-│   ├── streamlit_app.py
-│   └── Dockerfile
+├── app/                         # FastAPI backend application
 │
-├── models/
-│   └── model.pkl
+├── frontend/                    # Streamlit frontend application
 │
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
+├── models/                      # Trained machine learning models
+│
+├── tests/                       # Test suite
+│
+├── k8s/                         # Kubernetes manifests
+│   │
+│   ├── backend/                 # Backend deployment, service, HPA
+│   │
+│   ├── config/                  # ConfigMap and Secret
+│   │
+│   ├── frontend/                # Frontend deployment and service
+│   │
+│   ├── ingress/                 # Ingress configuration
+│   │   └── ingress.yaml
+│   │
+│   └── namespace.yaml
+│
+├── .env                         # Local environment variables
 ├── .gitignore
+├── docker-compose.yml
+├── dockerfile                   # Backend Docker image
+├── pytest.ini
+├── requirements.txt
 └── README.md
 ```
 
-## Application Flow
+---
 
-```text
-User Input
-    ↓
-Streamlit UI
-    ↓
-POST /predict
-    ↓
-FastAPI
-    ↓
-Request Validation
-    ↓
-Feature Engineering
-    ├── HouseAge
-    ├── RemodAge
-    ├── TotalSF
-    └── TotalBath
-    ↓
-Feature Alignment
-    ↓
-CatBoostRegressor
-    ↓
-Log-Scale Prediction
-    ↓
-np.expm1()
-    ↓
-Predicted House Price
-```
+## Features
 
-## API Endpoints
+* House price prediction using a trained CatBoost model
+* REST API built with FastAPI
+* Interactive web interface built with Streamlit
+* Docker-based application containerization
+* Multi-container local deployment with Docker Compose
+* Kubernetes Deployments and Services
+* Liveness and readiness probes
+* ConfigMap-based application configuration
+* Kubernetes Secret integration
+* Horizontal Pod Autoscaling
+* Resource monitoring using Metrics Server
+* NGINX Ingress-based routing
+* Rolling updates and deployment rollback
+* Automated testing with Pytest
 
-| Method | Endpoint   | Description                       |
-| ------ | ---------- | --------------------------------- |
-| GET    | `/`        | API information                   |
-| GET    | `/health`  | Application health check          |
-| POST   | `/predict` | Predict house price               |
-| GET    | `/docs`    | Interactive Swagger documentation |
+---
 
-## Run Locally
+# Getting Started
 
-### 1. Clone the repository
+## Prerequisites
+
+The following tools are required:
+
+* Python 3.12+
+* Docker
+* Docker Compose
+* Kubernetes
+* kubectl
+
+---
+
+## Clone the Repository
 
 ```bash
 git clone <repository-url>
 cd HousePrice-Prediction
 ```
 
-### 2. Create a virtual environment
+---
 
-```bash
+## Local Development
+
+### Create a Virtual Environment
+
+#### Windows
+
+```powershell
 python -m venv venv
-```
-
-Activate it on Windows:
-
-```bash
 venv\Scripts\activate
 ```
 
-### 3. Install dependencies
+#### Linux/macOS
+
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Start the FastAPI backend
+---
+
+## Run the Backend
+
+Start the FastAPI application:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Backend:
+The API will be available at:
 
 ```text
-http://127.0.0.1:8000
+http://localhost:8000
 ```
 
-Swagger documentation:
+Interactive API documentation:
 
 ```text
-http://127.0.0.1:8000/docs
+http://localhost:8000/docs
 ```
 
-### 5. Start the Streamlit frontend
+---
 
-Open another terminal and run:
+## Run the Frontend
+
+Start the Streamlit application:
 
 ```bash
-streamlit run frontend/streamlit_app.py
+streamlit run frontend/app.py
 ```
 
-Frontend:
+The frontend will be available at:
 
 ```text
 http://localhost:8501
 ```
 
-## Run with Docker Compose
+---
 
-The easiest way to run the complete application is with Docker Compose.
+# Docker
+
+## Build the Backend Image
+
+```bash
+docker build -t raviikrds/house-price-backend:latest .
+```
+
+Run the backend container:
+
+```bash
+docker run -p 8000:8000 raviikrds/house-price-backend:latest
+```
+
+## Build the Frontend Image
+
+```bash
+docker build -t house-price-frontend ./frontend
+```
+
+Run the frontend container:
+
+```bash
+docker run -p 8501:8501 house-price-frontend
+```
+
+---
+
+# Docker Compose
+
+The frontend and backend can be started together using Docker Compose.
 
 ```bash
 docker compose up --build
 ```
 
-This command will:
+Run in detached mode:
 
-1. Build the FastAPI Docker image
-2. Build the Streamlit Docker image
-3. Create a shared Docker network
-4. Start the backend container
-5. Start the frontend container
+```bash
+docker compose up -d --build
+```
 
-Access the application:
-
-| Service            | URL                          |
-| ------------------ | ---------------------------- |
-| Streamlit Frontend | `http://localhost:8501`      |
-| FastAPI API        | `http://localhost:8000`      |
-| Swagger UI         | `http://localhost:8000/docs` |
-
-To stop the application:
+Stop the services:
 
 ```bash
 docker compose down
 ```
 
-## Docker Architecture
+---
 
-```text
-Docker Compose
-│
-├── frontend
-│   ├── Streamlit
-│   ├── Port 8501
-│   └── Sends requests to backend
-│
-└── backend
-    ├── FastAPI
-    ├── Port 8000
-    ├── Preprocessing
-    └── CatBoost Model
+# Kubernetes
+
+The application is deployed using the following Kubernetes resources:
+
+* Namespace
+* Deployment
+* Service
+* ConfigMap
+* Secret
+* Horizontal Pod Autoscaler
+* Ingress
+
+## Deploy the Application
+
+Create the namespace:
+
+```bash
+kubectl apply -f k8s/namespace.yaml
 ```
 
-Inside Docker Compose, the frontend communicates with the backend using the service name:
+Apply configuration:
 
-```text
-http://backend:8000/predict
+```bash
+kubectl apply -f k8s/config/
 ```
 
-This is configured using an environment variable.
+Deploy the backend:
 
-## Example Prediction Response
+```bash
+kubectl apply -f k8s/backend/
+```
+
+Deploy the frontend:
+
+```bash
+kubectl apply -f k8s/frontend/
+```
+
+Configure ingress:
+
+```bash
+kubectl apply -f k8s/ingress/
+```
+
+Verify the deployment:
+
+```bash
+kubectl get deployments
+kubectl get pods
+kubectl get services
+kubectl get ingress
+```
+
+---
+
+# Application Routing
+
+The application uses NGINX Ingress to expose both services through a single entry point.
+
+```text
+http://house-price.local
+```
+
+Routing configuration:
+
+```text
+/       → Streamlit Frontend
+/api    → FastAPI Backend
+```
+
+The backend API documentation is available at:
+
+```text
+http://house-price.local/api/docs
+```
+
+---
+
+# Horizontal Pod Autoscaling
+
+The backend service is configured with a Horizontal Pod Autoscaler.
+
+```text
+Minimum Replicas: 2
+Maximum Replicas: 5
+Target CPU Utilization: 50%
+```
+
+Monitor autoscaling:
+
+```bash
+kubectl get hpa
+```
+
+Watch scaling activity:
+
+```bash
+kubectl get hpa -w
+```
+
+Monitor pod creation:
+
+```bash
+kubectl get pods -w
+```
+
+---
+
+# Resource Monitoring
+
+The Kubernetes Metrics Server enables resource monitoring.
+
+Check node usage:
+
+```bash
+kubectl top nodes
+```
+
+Check pod usage:
+
+```bash
+kubectl top pods
+```
+
+---
+
+# Health Checks
+
+The backend exposes a health endpoint:
+
+```http
+GET /health
+```
+
+Kubernetes uses this endpoint for:
+
+* **Liveness Probe** — Determines whether a container should be restarted.
+* **Readiness Probe** — Determines whether a pod is ready to receive traffic.
+
+```text
+Container
+    │
+    ▼
+Readiness Probe
+    │
+    ├── Healthy → Receives Traffic
+    │
+    └── Unhealthy → Removed from Service Endpoints
+```
+
+---
+
+# Deployment Strategy
+
+## Rolling Update
+
+Update the backend image:
+
+```bash
+kubectl set image deployment/house-price-backend \
+backend=raviikrds/house-price-backend:<version>
+```
+
+Monitor the rollout:
+
+```bash
+kubectl rollout status deployment/house-price-backend
+```
+
+View deployment history:
+
+```bash
+kubectl rollout history deployment/house-price-backend
+```
+
+---
+
+## Rollback
+
+Rollback to the previous deployment revision:
+
+```bash
+kubectl rollout undo deployment/house-price-backend
+```
+
+Rollback to a specific revision:
+
+```bash
+kubectl rollout undo deployment/house-price-backend \
+--to-revision=<revision-number>
+```
+
+---
+
+# Testing
+
+Run the complete test suite:
+
+```bash
+pytest
+```
+
+Run tests with verbose output:
+
+```bash
+pytest -v
+```
+
+---
+
+# API
+
+## Health Check
+
+```http
+GET /health
+```
+
+Example response:
 
 ```json
 {
-  "predicted_price": 119329.95
+  "status": "healthy"
 }
 ```
 
-## Key Concepts Demonstrated
+## Prediction
 
-This project demonstrates:
-
-* Machine learning model serving
-* FastAPI REST API development
-* Pydantic request validation
-* Feature engineering during inference
-* Model serialization and loading
-* Streamlit frontend development
-* Frontend-to-backend API communication
-* Docker image creation
-* Docker container execution
-* Multi-container applications with Docker Compose
-* Service-to-service communication using Docker networking
-
-## Future Improvements
-
-* Add unit and integration tests
-* Add automated testing with `pytest`
-* Implement GitHub Actions CI/CD
-* Push Docker images to Docker Hub or AWS ECR
-* Add structured logging
-* Add model versioning with MLflow
-* Add input validation with stricter schemas
-* Deploy the application to AWS
-* Add monitoring and observability
-
-## Run Summary
-
-### Local development
-
-```text
-Terminal 1
-    ↓
-FastAPI
-    ↓
-localhost:8000
-
-
-Terminal 2
-    ↓
-Streamlit
-    ↓
-localhost:8501
+```http
+POST /predict
 ```
 
-### Containerized application
+The prediction endpoint accepts house-related features and returns the predicted house price.
+
+Interactive API documentation is available through FastAPI Swagger UI:
 
 ```text
-docker compose up --build
-            ↓
-     Docker Network
-            │
-      ┌─────┴─────┐
-      ▼           ▼
- Streamlit      FastAPI
-  :8501          :8000
-                    │
-                    ▼
-             CatBoost Model
+http://localhost:8000/docs
 ```
-
-## License
-
-This project is intended for learning and portfolio purposes.
 
 ---
+
+# Key Engineering Concepts
+
+This project demonstrates practical implementation of:
+
+* Machine Learning model serving
+* REST API development
+* Service-based application architecture
+* Docker containerization
+* Multi-container orchestration
+* Kubernetes Deployments
+* Kubernetes Services
+* ConfigMap and Secret management
+* Liveness and readiness probes
+* Horizontal Pod Autoscaling
+* Metrics-based resource monitoring
+* Rolling updates
+* Deployment rollback
+* NGINX Ingress routing
+
+---
+
+# Future Improvements
+
+Potential enhancements include:
+
+* CI/CD pipeline with GitHub Actions
+* Automated Docker image versioning
+* Container registry integration
+* Cloud deployment using managed Kubernetes
+* Infrastructure as Code using Terraform
+* Monitoring with Prometheus and Grafana
+* Centralized logging
+* Model versioning with MLflow
+* Model monitoring and drift detection
+* HTTPS with cert-manager
+* Authentication and authorization
+* API rate limiting
+
+---
+
+# License
+
+This project is intended for educational, portfolio, and demonstration purposes.
+
+--
